@@ -11,7 +11,7 @@ $('#js-form').submit(async (event) => {
         filtro(covid);
         mostrarGrafico(covid);  
         graficoChile(chileConfirmados,chileMuertos,ChileRecuperados)        
-        toggleFormAndTable('inicioSesion', 'grafico','situacionChile');
+        toggleFormAndTable('inicioSesion', 'grafico','situacionChile','cerrarSesion');
     }else{
         alert('Ingresa bien el correo')
     }
@@ -131,7 +131,7 @@ const filtro = (data) => {
 //muestro el grafico de los paises contagiados de acuerdo al filtro.
 const  mostrarGrafico=(data)=>{  
     let filtro = data.filter(caso => {
-        return caso.active >  100000;
+        return caso.active > 100000;
     });
    
    let activos=[];
@@ -148,7 +148,7 @@ const  mostrarGrafico=(data)=>{
      pais.push(filtro[i].location)        
     }
 
-    var ctx = document.getElementById('myChart').getContext('2d');
+    var ctx = document.getElementById('myChart')
     var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -208,11 +208,20 @@ const  mostrarGrafico=(data)=>{
         }]
     },
     options: {
+        responsive: true,
         scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+            x:{
+                display:true,
+            },
+            y: {       
+                display:true,                    
+                  min: 0,
+                  max: 1000000,
+                  ticks:{
+                  stepSize: 8000,
+                  }                               
+            }       
+          }
     }
 });
     }
@@ -230,38 +239,56 @@ function verDetalle(i) {
 
 //grafico Chile.
 const graficoChile=(data1,data2,data3)=>{
-    let fecha= data1.forEach(confirmados=>{
-        return  confirmados.date;
+    let fecha=[]
+     data1.forEach(confirmados=>{
+        return fecha.push(confirmados.date);
     });
-    let datosConfirmados=data1.forEach(confirmados=>{
-        return confirmados.total;
-    })
-  /*   let fechaMuertos= data2.forEach(muertos=>{
-        return muertos.date;
-    }); */
-    let datosMuertos=data2.forEach(muertos=>{
-        return muertos.total
-    })
-   /*  let fechaRecuperados= data3.forEach(recuperados=>{
-        return recuperados.date;
-    }) */
-    let datosRecuperados=data3.forEach(recuperados=>{
-        return recuperados.total
-    })
-    var datos = {
-        labels: fecha,
-        datasets: [{
-         
-          data: datosConfirmados,
-        }]
-      };
+    let datosConfirmados=[]
+     data1.forEach(confirmados=>{      
+        return datosConfirmados.push(confirmados.total);
+    });
 
+    let datosMuertos=[]
+    data2.forEach(muertos=>{
+        return datosMuertos.push(muertos.total)
+    });
+ 
+    let datosRecuperados=[]
+    data3.forEach(recuperados=>{
+        return datosRecuperados.push(recuperados.total)
+    }) 
     let chile= document.getElementById('myChart2')
-    var lineChart = new Chart(chile, {
-        type: 'line',
-        data: datos
-       
-      });
+    const labels = fecha;  
+    var   chart= new Chart(chile,{
+        type:'line',
+        data: {
+            labels: labels,
+            datasets: [{
+              label: 'Confirmados',
+              data: datosConfirmados,
+              fill: false,
+              backgroundColor: 'rgb(255, 99, 132)',
+              borderColor:'rgb(255, 99, 132)'
+             },
+             {
+                label: 'Muertos',
+                data: datosMuertos,
+                fill: false,
+                backgroundColor: 'rgb(54, 162, 235)',
+                borderColor: 'rgb(54, 162, 235)'
+               },
+               {
+                label: 'Recuperados',
+                data: datosRecuperados,
+                fill: false,
+                backgroundColor: 'rgb(255, 205, 86)',
+                borderColor:'rgb(255, 205, 86)'
+               }
+            
+            ]
+          }
+    })
+   
 
 }
 
@@ -278,8 +305,8 @@ const toggleFormAndTable = (form, grafico,chile) => {
 let cerrar = document.getElementById('cerrar');
 cerrar.addEventListener('click', () => {
     localStorage.removeItem('jwt')
-    let btn = document.getElementById('cerrar')
-    btn.setAttribute('style', "display: none");
+   /*  let btn = document.getElementById('cerrar')
+    btn.setAttribute('style', "display: none"); */
     let sesion = document.getElementById('inicioSesion')
     sesion.setAttribute('style', "display: block");
     let grafico = document.getElementById('grafico')
@@ -295,13 +322,13 @@ const init = async() => {
     const token = localStorage.getItem('jwt')
     if (token) {
         const covid = await getCovid(token)
-       /*  const chileConfirmados=  await getChileConfirmados(token);
+        const chileConfirmados=  await getChileConfirmados(token);
         const chileMuertos=  await getChileMuertos(token); 
-        const ChileRecuperados=  await getChileRecuperados(token); */
+        const ChileRecuperados=  await getChileRecuperados(token);
         filtro(covid);      
         mostrarGrafico(covid);  
-     /*    graficoChile(chileConfirmados,chileMuertos,ChileRecuperados) */   
-        toggleFormAndTable('inicioSesion', 'grafico','cerrarSesion');
+        graficoChile(chileConfirmados,chileMuertos,ChileRecuperados)   
+        toggleFormAndTable('inicioSesion', 'grafico','situacionChile');
     }
 }
 init()
