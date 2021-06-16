@@ -11,7 +11,7 @@ $('#js-form').submit(async (event) => {
         filtro(covid);
         mostrarGrafico(covid);  
         graficoChile(chileConfirmados,chileMuertos,ChileRecuperados)        
-        toggleFormAndTable('inicioSesion', 'grafico','situacionChile','cerrarSesion');
+        toggleFormAndTable('inicioSesion', 'grafico','situacionChile','cerrar'); 
     }else{
         alert('Ingresa bien el correo')
     }
@@ -127,6 +127,17 @@ const filtro = (data) => {
     })
    
 }
+//genero el modal por cada uno de los países que filtre e ingrese en el arrays pais
+function verDetalle(i) {
+    let pais = paises[0][i];
+ document.getElementById('titulo').textContent=`Resumen ${pais.location}`
+    let modal = document.getElementById('datosPais')
+    modal.innerHTML = `<p>Casos activos: ${pais.active}</p>
+                <p>Casos confirmados: ${pais.confirmed}</p>
+                <p>Muertos: ${pais.deaths}</p>
+                <p>Recuperados: ${pais.recovered}</p>`
+
+}
 
 //muestro el grafico de los paises contagiados de acuerdo al filtro.
 const  mostrarGrafico=(data)=>{  
@@ -225,17 +236,7 @@ const  mostrarGrafico=(data)=>{
     }
 });
     }
-//genero el modal por cada uno de los países que filtre e ingrese en el arrays pais
-function verDetalle(i) {
-    let pais = paises[0][i];
- document.getElementById('titulo').textContent=`Resumen ${pais.location}`
-    let modal = document.getElementById('datosPais')
-    modal.innerHTML = `<p>Casos activos: ${pais.active}</p>
-                <p>Casos confirmados: ${pais.confirmed}</p>
-                <p>Muertos: ${pais.deaths}</p>
-                <p>Recuperados: ${pais.recovered}</p>`
 
-}
 
 //grafico Chile.
 const graficoChile=(data1,data2,data3)=>{
@@ -294,10 +295,11 @@ const graficoChile=(data1,data2,data3)=>{
 
 
 //oculto las tablas y muestro en primera instancia el login
-const toggleFormAndTable = (form, grafico,chile) => {
+const toggleFormAndTable = (form, grafico,chile,cerrar) => {
     $(`#${form}`).toggle()
     $(`#${grafico}`).toggle()
-    $(`#${chile}`).toggle()
+    $(`#${chile}`).toggle()   
+    $(`#${cerrar}`).toggle()
 
 }
 
@@ -311,7 +313,9 @@ cerrar.addEventListener('click', () => {
     sesion.setAttribute('style', "display: block");
     let grafico = document.getElementById('grafico')
     grafico.setAttribute('style', "display: none");
-    let chile = document.getElementById('situacionChile')
+    let cerrar = document.getElementById('cerrar')
+    cerrar.setAttribute('style', "display: none");
+   let chile = document.getElementById('situacionChile')
     chile.setAttribute('style', "display: none");
     document.getElementById('js-input-email').value = ""
     document.getElementById('js-input-password').value = ""
@@ -328,7 +332,7 @@ const init = async() => {
         filtro(covid);      
         mostrarGrafico(covid);  
         graficoChile(chileConfirmados,chileMuertos,ChileRecuperados)   
-        toggleFormAndTable('inicioSesion', 'grafico','situacionChile');
+        toggleFormAndTable('inicioSesion', 'grafico','situacionChile','cerrar');
     }
 }
 init()
